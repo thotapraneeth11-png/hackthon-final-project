@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#060911">
+  <title>Cyber Shield SOC • Enterprise Security Operations & Autonomous Threat Defense</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Emergency Panic Lockdown Banner -->
+  <div id="emergencyLockdownBanner" class="emergency-banner">
+    <span>🚨</span>
+    <span>EMERGENCY PHONE & DEVICE LOCKDOWN ACTIVE: ALL EXTERNAL INGRESS TERMINATED — PHONES AND ENDPOINTS ISOLATED</span>
+    <button class="btn-inspect" style="background: #fff; color: #b30000; font-weight: 800; padding: 2px 10px;" onclick="window.releaseLockdown()">RELEASE LOCKDOWN</button>
+  </div>
+
+  <div class="soc-shell">
+
+    <!-- =====================================================
+                       COLLAPSIBLE SIDEBAR
+    ===================================================== -->
+    <aside class="soc-sidebar" id="socSidebar">
+      <!-- Sidebar Brand Header -->
+      <div class="sidebar-brand-header">
+        <div class="sidebar-brand-icon">🛡️</div>
+        <div class="sidebar-brand-text">
+          <h1>CYBER SHIELD <span class="brand-badge">SOC v6.0</span></h1>
+          <p>Autonomous Defense Platform</p>
+        </div>
+      </div>
+
+      <!-- Navigation Items Grouped by Category -->
+      <div class="sidebar-nav-content">
+        <!-- Group: PORTAL GATEWAY -->
+        <div class="sidebar-nav-group">
+          <div class="sidebar-nav-header">Portal Gateway</div>
+          <div class="sidebar-nav-item active" data-tab="tab-landing">
+            <span class="nav-icon">🌐</span>
+            <span class="sidebar-item-label">Portal Gateway</span>
+            <span class="sidebar-item-badge cyan">Gateway</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-user-portal">
+            <span class="nav-icon">👤</span>
+            <span class="sidebar-item-label">User Portal (Enrolment)</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-admin-control">
+            <span class="nav-icon">👑</span>
+            <span class="sidebar-item-label">Admin Control Center</span>
+          </div>
+        </div>
+
+        <!-- Group: OPERATIONS -->
+        <div class="sidebar-nav-group">
+          <div class="sidebar-nav-header">Operations</div>
+          <div class="sidebar-nav-item" data-tab="tab-overview">
+            <span class="nav-icon">📊</span>
+            <span class="sidebar-item-label">Security Overview</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-incidents">
+            <span class="nav-icon">🚨</span>
+            <span class="sidebar-item-label">Incidents</span>
+            <span class="sidebar-item-badge" id="activeIncidentsBadge">4</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-alerts">
+            <span class="nav-icon">⚡</span>
+            <span class="sidebar-item-label">Security Alerts</span>
+            <span class="sidebar-item-badge" id="alertBadgeCount">3</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-soc">
+            <span class="nav-icon">🌐</span>
+            <span class="sidebar-item-label">Live Threat Map HUD</span>
+          </div>
+        </div>
+
+        <!-- Group: THREAT INTELLIGENCE & HUNTING -->
+        <div class="sidebar-nav-group">
+          <div class="sidebar-nav-header">Threat Intel & Range</div>
+          <div class="sidebar-nav-item" data-tab="tab-threat-intel">
+            <span class="nav-icon">🎯</span>
+            <span class="sidebar-item-label">Threat Intel (IOCs)</span>
+            <span class="sidebar-item-badge cyan" id="iocBadgeCount">6</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-simulator">
+            <span class="nav-icon">⚔️</span>
+            <span class="sidebar-item-label">Cyber Attack Range</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-source">
+            <span class="nav-icon">📍</span>
+            <span class="sidebar-item-label">Code Target Forensics</span>
+          </div>
+        </div>
+
+        <!-- Group: HARDWARE COLLECTOR & INGESTION -->
+        <div class="sidebar-nav-group">
+          <div class="sidebar-nav-header">Hardware & Ingestion</div>
+          <div class="sidebar-nav-item" data-tab="tab-hardware-monitor">
+            <span class="nav-icon">🖥️</span>
+            <span class="sidebar-item-label">Hardware & Ingestion</span>
+            <span class="sidebar-item-badge emerald" id="hardwareNodeBadge">5 Online</span>
+          </div>
+        </div>
+
+        <!-- Group: DEFENSE & PERIMETER -->
+        <div class="sidebar-nav-group">
+          <div class="sidebar-nav-header">Defense & Endpoints</div>
+          <div class="sidebar-nav-item" data-tab="tab-security-panel">
+            <span class="nav-icon">🛡️</span>
+            <span class="sidebar-item-label">Security Panel</span>
+            <span class="sidebar-item-badge" id="firewallBadgeCount">1</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-mobile">
+            <span class="nav-icon">📱</span>
+            <span class="sidebar-item-label">Phone & Mobile Shield</span>
+            <span class="sidebar-item-badge emerald" id="mobileBadgeCount">3</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-stealth">
+            <span class="nav-icon">🕵️</span>
+            <span class="sidebar-item-label">Stealth Cloak & Decoys</span>
+          </div>
+        </div>
+
+        <!-- Group: VERIFICATION & IDENTITY -->
+        <div class="sidebar-nav-group">
+          <div class="sidebar-nav-header">Verification & Identity</div>
+          <div class="sidebar-nav-item" data-tab="tab-verification-panel">
+            <span class="nav-icon">🔑</span>
+            <span class="sidebar-item-label">Verification Panel</span>
+            <span class="sidebar-item-badge emerald">2FA Active</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-ueba">
+            <span class="nav-icon">👤</span>
+            <span class="sidebar-item-label">Identity & UEBA</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-dlp">
+            <span class="nav-icon">🔒</span>
+            <span class="sidebar-item-label">Data Loss Prevention</span>
+          </div>
+        </div>
+
+        <!-- Group: GOVERNANCE & ADMIN -->
+        <div class="sidebar-nav-group">
+          <div class="sidebar-nav-header">Governance & Admin</div>
+          <div class="sidebar-nav-item" data-tab="tab-admin-control">
+            <span class="nav-icon">👑</span>
+            <span class="sidebar-item-label">Admin Control Panel</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-audit-trail">
+            <span class="nav-icon">📜</span>
+            <span class="sidebar-item-label">Audit Trails (RBAC)</span>
+            <span class="sidebar-item-badge cyan">SHA-256</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-database-schema">
+            <span class="nav-icon">🗄️</span>
+            <span class="sidebar-item-label">Database Schema</span>
+            <span class="sidebar-item-badge">SQLite</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-settings">
+            <span class="nav-icon">⚙️</span>
+            <span class="sidebar-item-label">Security Settings</span>
+          </div>
+          <div class="sidebar-nav-item" data-tab="tab-reports">
+            <span class="nav-icon">📄</span>
+            <span class="sidebar-item-label">Audit Reports</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-text">
+          <div style="font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">5-Min Watchdog</div>
+          <div id="sidebarWatchdogTimer" class="code-font" style="font-size: 12px; color: var(--accent-cyan); font-weight: 700;">04:45</div>
+        </div>
+        <button id="btnSidebarToggle" class="btn-sidebar-toggle" title="Collapse / Expand Sidebar" onclick="window.toggleSidebar()">
+          ◀
+        </button>
+      </div>
+    </aside>
+
+    <!-- =====================================================
+                       MAIN VIEWPORT CONTAINER
+    ===================================================== -->
+    <div class="soc-main-viewport">
+
+      <!-- Top Enterprise Navigation Bar -->
+      <header class="soc-top-bar">
+        <div class="top-bar-left">
+          <button id="btnSidebarToggleTop" class="btn-sidebar-toggle" style="display: none;" onclick="window.toggleSidebar()" title="Toggle Sidebar">
+            ☰
+          </button>
+          <!-- Global Quick-Search Input -->
+          <div class="global-search-wrapper">
+            <span class="search-icon-prefix">🔍</span>
+            <input id="globalSearchInput" class="global-search-input" placeholder="Search alerts, incidents, IOCs, IP addresses, users... (Ctrl+K)" autocomplete="off">
+            <span class="search-kbd-hint">Ctrl K</span>
+          </div>
+        </div>
+
+        <div class="top-bar-right">
+          <!-- Time Range Filter Selector -->
+          <div class="time-range-group" id="timeRangeGroup">
+            <button class="time-range-btn" data-range="1h">1H</button>
+            <button class="time-range-btn active" data-range="24h">24H</button>
+            <button class="time-range-btn" data-range="7d">7D</button>
+            <button class="time-range-btn" data-range="30d">30D</button>
+            <button class="time-range-btn" data-range="live">LIVE</button>
+          </div>
+
+          <!-- Auto-Refresh Interval Controls -->
+          <div class="refresh-control-box">
+            <select id="selectAutoRefresh" class="form-select" style="padding: 5px 8px; font-size: 11px; background: rgba(15, 23, 42, 0.8); border-color: rgba(56, 189, 248, 0.2);">
+              <option value="15000">Refresh: 15s</option>
+              <option value="5000">Refresh: 5s</option>
+              <option value="30000">Refresh: 30s</option>
+              <option value="0">Paused</option>
+            </select>
+            <button id="btnRefreshData" class="btn-icon-top" title="Refresh Telemetry Now" onclick="window.refreshAllData()">
+              🔄
+            </button>
+          </div>
+
+          <!-- Notification Bell -->
+          <div style="position: relative;">
+            <button id="btnNotifications" class="btn-icon-top" title="Security Notifications" onclick="window.toggleNotificationsPopover()">
+              🔔
+              <span class="notif-badge-dot"></span>
+            </button>
+            <!-- Notification Popover Dropdown -->
+            <div id="notificationsPopover" class="notifications-popover" style="display: none; position: absolute; right: 0; top: 40px; width: 340px; background: #0c1626; border: 1px solid var(--border-color); border-radius: var(--radius-sm); box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 200; padding: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
+                <span style="font-weight: 700; color: #fff; font-size: 12px;">Security Notifications</span>
+                <button class="btn-inspect" style="font-size: 10px; padding: 2px 6px;" onclick="window.clearNotifications()">Clear</button>
+              </div>
+              <div id="notificationsList" style="max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Portal Switcher Button -->
+          <button id="btnHeaderPortalGateway" class="btn-action blue" onclick="window.switchTab('tab-landing')" title="Open User & Admin Portal Selection Gateway">
+            <span>🌐</span> Portals Gateway
+          </button>
+
+          <!-- Security 2FA Verification Pill -->
+          <div id="verificationStatusPill" class="verification-status-pill" onclick="window.open2faModal()" title="Two-Factor Security Verification Status - Click to Verify">
+            <span>🛡️</span>
+            <span id="txt2faStatus">2FA VERIFIED</span>
+          </div>
+
+          <!-- Active RBAC Identity Pill -->
+          <div id="rbacUserPill" class="rbac-pill" onclick="window.openRbacModal()" title="Current RBAC Role & User - Click to Switch Account">
+            <span class="rbac-dot"></span>
+            <span id="currentRbacRoleBadge" class="role-badge SUPER_ADMIN">SUPER_ADMIN</span>
+            <span id="currentRbacName" class="rbac-name">Sunny</span>
+            <span style="font-size: 11px; color: var(--text-dim);">▼</span>
+          </div>
+
+          <!-- Emergency Panic Button -->
+          <button id="btnEmergencyLockdown" class="btn-emergency-panic" title="Trigger instant emergency lockdown for website, network, and connected phones" onclick="window.triggerLockdown()">
+            <span>🚨</span> LOCKDOWN
+          </button>
+        </div>
+      </header>
+
+      <!-- Contextual Enterprise KPI Ribbon (Clean, No-Scrap Layout) -->
+      <section class="kpi-grid" id="globalKpiRibbon">
+        <div class="kpi-card" onclick="window.switchTab('tab-alerts')" style="cursor: pointer;" title="Click to view alerts">
+          <div class="kpi-header"><span class="kpi-title">Packets Inspected</span><span class="kpi-icon">📦</span></div>
+          <div class="kpi-value" id="kpiPackets">5,484</div>
+          <div class="kpi-subtext"><span>⚡</span> Real-time flow aggregation</div>
+        </div>
+
+        <div class="kpi-card success" onclick="window.switchTab('tab-security-panel')" style="cursor: pointer;" title="Click to view firewall">
+          <div class="kpi-header"><span class="kpi-title">Threats Neutralized</span><span class="kpi-icon">🛡️</span></div>
+          <div class="kpi-value" id="kpiThreats" style="color: var(--accent-emerald);">3</div>
+          <div class="kpi-subtext"><span>✓</span> Autonomous active drops</div>
+        </div>
+
+        <div class="kpi-card critical" onclick="window.switchTab('tab-alerts')" style="cursor: pointer;" title="Click to filter active alerts">
+          <div class="kpi-header"><span class="kpi-title">Active Alerts</span><span class="kpi-icon">🚨</span></div>
+          <div class="kpi-value" id="kpiAlerts" style="color: var(--accent-crimson);">2</div>
+          <div class="kpi-subtext"><span>●</span> Real-time forensic triage</div>
+        </div>
+
+        <div class="kpi-card warning" onclick="window.switchTab('tab-incidents')" style="cursor: pointer;" title="Click to view active incidents">
+          <div class="kpi-header"><span class="kpi-title">Active Incidents</span><span class="kpi-icon">📋</span></div>
+          <div class="kpi-value" id="kpiIncidents" style="color: var(--accent-amber);">4</div>
+          <div class="kpi-subtext"><span>●</span> Formalized IR cases</div>
+        </div>
+
+        <div class="kpi-card" onclick="window.switchTab('tab-threat-intel')" style="cursor: pointer;" title="Click to view Threat Intelligence">
+          <div class="kpi-header"><span class="kpi-title">Threat Indicators (IOCs)</span><span class="kpi-icon">🎯</span></div>
+          <div class="kpi-value" id="kpiIocs" style="color: var(--accent-cyan);">6</div>
+          <div class="kpi-subtext"><span>🧠</span> STIX 2.1 intelligence</div>
+        </div>
+
+        <div class="kpi-card success" onclick="window.switchTab('tab-mobile')" style="cursor: pointer;" title="Click to view shielded phones">
+          <div class="kpi-header"><span class="kpi-title">Phone Endpoints Shielded</span><span class="kpi-icon">📱</span></div>
+          <div class="kpi-value" id="kpiPhones" style="color: var(--accent-blue);">3</div>
+          <div class="kpi-subtext"><span>✓</span> Android & iOS MDM Active</div>
+        </div>
+
+        <div class="kpi-card" onclick="window.switchTab('tab-source')" style="cursor: pointer;" title="Click to view virtual patches">
+          <div class="kpi-header"><span class="kpi-title">Virtual Patches Active</span><span class="kpi-icon">📍</span></div>
+          <div class="kpi-value" id="kpiPatches" style="color: var(--accent-cyan);">1</div>
+          <div class="kpi-subtext"><span>🧠</span> In-memory code hotfixes</div>
+        </div>
+
+        <div class="kpi-card warning" onclick="window.switchTab('tab-dlp')" style="cursor: pointer;" title="Click to view DLP findings">
+          <div class="kpi-header"><span class="kpi-title">DLP Leaks Intercepted</span><span class="kpi-icon">🔒</span></div>
+          <div class="kpi-value" id="kpiDlpLeaks" style="color: var(--accent-amber);">0</div>
+          <div class="kpi-subtext"><span>🛡️</span> PCI-DSS / Luhn verified</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header"><span class="kpi-title">Engine Uptime</span><span class="kpi-icon">⏱️</span></div>
+          <div class="kpi-value" id="kpiUptime">00:04:32</div>
+          <div class="kpi-subtext"><span>●</span> Continuous protection</div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+                         MAIN CONTENT TAB PANES
+      ===================================================== -->
+      <main class="main-content">
+
+        <!-- =====================================================
+             TAB 1: FILE 2 INTEGRATION: PORTAL GATEWAY & HERO
+        ===================================================== -->
+        <div id="tab-landing" class="tab-pane active">
+          <div class="hero-banner-section">
+            <div class="live-badge-hero">
+              <span class="pulse-dot-green"></span>
+              LIVE • 5 DEVICES SHIELDED
+            </div>
+            <h1 class="hero-main-title">
+              When a device is hacked, <span class="text-gradient">we answer in seconds.</span>
+            </h1>
+            <p class="hero-subtext">
+              Choose how you enter. Administrators run the security console. Device owners register and verify with a one-time code.
+            </p>
+
+            <!-- 1. The Two Primary Interactive Gateway Cards -->
+            <div class="gateway-cards-grid">
+              <!-- Card A: Admin Control Panel -->
+              <article class="gateway-card">
+                <div>
+                  <div class="gateway-card-icon-box cyan">
+                    <span>👑</span>
+                  </div>
+                  <div class="gateway-badge cyan">Restricted • RBAC</div>
+                  <h2 class="gateway-card-title">Admin Control Panel</h2>
+                  <p class="gateway-card-desc">
+                    Password + OTP sign-in for SOC administrators. Watch every device, receive breach alerts, build firewalls and trace attackers.
+                  </p>
+                  <div class="gateway-feature-list">
+                    <div class="gateway-feature-item"><span>✓</span> Two-step sign in (password + OTP)</div>
+                    <div class="gateway-feature-item"><span>✓</span> Breach test lab with live test cases</div>
+                    <div class="gateway-feature-item"><span>✓</span> Firewall & admin management</div>
+                  </div>
+                </div>
+                <button class="btn-gateway-cta primary" onclick="window.chooseAdminPortal()">
+                  Open Admin Control Panel ➔
+                </button>
+              </article>
+
+              <!-- Card B: User Registration -->
+              <article class="gateway-card user-card">
+                <div>
+                  <div class="gateway-card-icon-box emerald">
+                    <span>📱</span>
+                  </div>
+                  <div class="gateway-badge emerald">Free • Device Owners</div>
+                  <h2 class="gateway-card-title">User Registration</h2>
+                  <p class="gateway-card-desc">
+                    Register your phone or computer, confirm with a 6-digit code, and get an instant alert if it is ever compromised.
+                  </p>
+                  <div class="gateway-feature-list">
+                    <div class="gateway-feature-item"><span>✓</span> Unique device ID (CS50-XXXX)</div>
+                    <div class="gateway-feature-item"><span>✓</span> OTP sent to phone & email</div>
+                    <div class="gateway-feature-item"><span>✓</span> Instant hacked-device alerts</div>
+                  </div>
+                </div>
+                <button class="btn-gateway-cta emerald" onclick="window.chooseUserPortal()">
+                  Register My Device ➔
+                </button>
+              </article>
+            </div>
+
+            <!-- 2. Admin Authentication & First-Time Password Setup Card -->
+            <div class="admin-login-wrapper" id="landingAdminAuthCard">
+              <div class="admin-login-header">
+                <div class="admin-login-icon">🔐</div>
+                <h2>Administrator Authentication Gate</h2>
+                <p>Authorized SOC analysts and administrators only. RBAC strictly enforced.</p>
+              </div>
+
+              <!-- Login Mode Tabs: Sign In vs First-Time Setup -->
+              <div class="login-mode-tabs">
+                <button class="login-tab-btn active" id="tabBtnSignInLanding" onclick="window.switchAdminLoginMode('signin')">
+                  🔑 Admin Sign In
+                </button>
+                <button class="login-tab-btn" id="tabBtnFirstTimeLanding" onclick="window.switchAdminLoginMode('first_time')">
+                  ⚡ First-Time Setup / Create Password
+                </button>
+              </div>
+
+              <!-- Mode A: Sign In Form with Password Show/Hide Toggle -->
+              <div id="landingAdminSignInForm" style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="form-group" style="text-align: left;">
+                  <label class="form-label">Administrator Username</label>
+                  <input id="landingAdminUsername" class="form-input" placeholder="e.g. SUNNY, alex.rivera, or sarah.chen" value="SUNNY" autocomplete="username">
+                </div>
+
+                <div class="form-group" style="text-align: left;">
+                  <label class="form-label">Administrator Password</label>
+                  <div class="password-input-wrapper">
+                    <input id="landingAdminPassword" class="form-input" type="password" placeholder="Enter administrator password" autocomplete="current-password" onkeydown="if(event.key==='Enter') window.performLandingAdminLogin()">
+                    <button type="button" class="btn-toggle-password" id="btnToggleLandingPassword" onclick="window.togglePasswordVisibility('landingAdminPassword', 'btnToggleLandingPassword')" title="Show / Hide Password">
+                      👁️
+                    </button>
+                  </div>
+                </div>
+
+                <div id="landingAdminLoginError" style="font-size: 12px; color: var(--accent-crimson); min-height: 16px;"></div>
+
+                <button class="btn-action green" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; font-weight: 700;" onclick="window.performLandingAdminLogin()">
+                  🔓 Authenticate & Open SOC Dashboard
+                </button>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px; color: var(--text-dim);">
+                  <span>Demo Master Admin: <b>SUNNY</b> / <b>MONKEY</b></span>
+                  <button class="btn-inspect" style="padding: 2px 8px; font-size: 10px;" onclick="window.quickFillAdminCredentials('SUNNY', 'MONKEY')">⚡ Fill Demo</button>
+                </div>
+              </div>
+
+              <!-- Mode B: First-Time Setup & Auto-Fix Password Generator -->
+              <div id="landingAdminFirstTimeForm" style="display: none; flex-direction: column; gap: 12px; text-align: left;">
+                <p style="color: var(--text-muted); font-size: 12px; line-height: 1.5; margin-bottom: 4px;">
+                  First time opening the administrator portal? Auto-generate a strong password or enter your custom password. The system will automatically configure and fix it for your account.
+                </p>
+
+                <div class="form-group">
+                  <label class="form-label">Administrator Username</label>
+                  <input id="firstTimeUsernameInput" class="form-input" placeholder="e.g. SUNNY, alex.rivera" value="SUNNY">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Set Password</label>
+                  <div class="password-input-wrapper">
+                    <input id="firstTimePasswordInput" class="form-input" type="password" placeholder="Enter or auto-generate password">
+                    <button type="button" class="btn-toggle-password" id="btnToggleFirstPassword" onclick="window.togglePasswordVisibility('firstTimePasswordInput', 'btnToggleFirstPassword')" title="Show / Hide Password">
+                      👁️
+                    </button>
+                  </div>
+                </div>
+
+                <button type="button" class="btn-action blue" style="justify-content: center; padding: 10px;" onclick="window.autoGenerateAdminPassword('firstTimePasswordInput', 'generatedPassBoxLanding', 'generatedPassValLanding')">
+                  ⚡ Auto-Generate Secure Password
+                </button>
+
+                <div id="generatedPassBoxLanding" style="display: none; background: rgba(0, 242, 254, 0.08); border: 1px solid var(--accent-cyan); border-radius: var(--radius-sm); padding: 12px; margin-top: 6px;">
+                  <div style="font-size: 11px; text-transform: uppercase; color: var(--accent-cyan); font-weight: 700;">Generated & Fixed Password:</div>
+                  <div id="generatedPassValLanding" class="code-font" style="font-size: 16px; color: #fff; font-weight: 800; margin: 4px 0; word-break: break-all;"></div>
+                  <div style="display: flex; gap: 8px; margin-top: 8px;">
+                    <button class="btn-action green" style="padding: 4px 10px; font-size: 11px;" onclick="window.copyPasswordFromElement('generatedPassValLanding')">📋 Copy Password</button>
+                    <button class="btn-action blue" style="padding: 4px 10px; font-size: 11px;" onclick="window.sendPasswordEmail('firstTimeUsernameInput', 'generatedPassValLanding')">📧 Email Password</button>
+                  </div>
+                </div>
+
+                <button class="btn-action yellow" style="width: 100%; justify-content: center; padding: 12px; font-size: 13px; font-weight: 700; margin-top: 4px;" onclick="window.createFirstTimeAdminPassword('firstTimeUsernameInput', 'firstTimePasswordInput')">
+                  💾 Save & Fix Password Now
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Architecture Alignment: 6-Step Flow -->
+            <section class="architecture-section">
+              <div class="architecture-title-group">
+                <div class="gateway-badge cyan">Architecture Alignment</div>
+                <h2 style="font-size: 28px; font-weight: 800; color: #fff; margin-top: 6px;">One flow, from sign-up to source trace</h2>
+              </div>
+
+              <div class="architecture-step-grid">
+                <div class="arch-step-card">
+                  <div class="arch-step-top"><span class="arch-step-icon">👤</span><span class="arch-step-num">01</span></div>
+                  <div class="arch-step-name">Register</div>
+                  <div class="arch-step-desc">Owner enrols device</div>
+                </div>
+                <div class="arch-step-card">
+                  <div class="arch-step-top"><span class="arch-step-icon">🔑</span><span class="arch-step-num">02</span></div>
+                  <div class="arch-step-name">Verify OTP</div>
+                  <div class="arch-step-desc">6-digit code by SMS & email</div>
+                </div>
+                <div class="arch-step-card">
+                  <div class="arch-step-top"><span class="arch-step-icon">📡</span><span class="arch-step-num">03</span></div>
+                  <div class="arch-step-name">Monitor</div>
+                  <div class="arch-step-desc">24/7 behavior analysis</div>
+                </div>
+                <div class="arch-step-card">
+                  <div class="arch-step-top"><span class="arch-step-icon">🔔</span><span class="arch-step-num">04</span></div>
+                  <div class="arch-step-name">Notify</div>
+                  <div class="arch-step-desc">Admin portal + device owner</div>
+                </div>
+                <div class="arch-step-card">
+                  <div class="arch-step-top"><span class="arch-step-icon">🔥</span><span class="arch-step-num">05</span></div>
+                  <div class="arch-step-name">Firewall</div>
+                  <div class="arch-step-desc">Rules auto-created</div>
+                </div>
+                <div class="arch-step-card">
+                  <div class="arch-step-top"><span class="arch-step-icon">🎯</span><span class="arch-step-num">06</span></div>
+                  <div class="arch-step-name">Trace</div>
+                  <div class="arch-step-desc">Locate hacker source file</div>
+                </div>
+              </div>
+
+              <!-- Layer Stack Visualizer -->
+              <div class="layer-stack-container">
+                <div class="layer-stack-row">
+                  <div class="layer-tag">
+                    <span class="layer-tag-badge">L4</span>
+                    <span class="layer-tag-title">Admin & Owner Apps</span>
+                  </div>
+                  <div class="layer-pills-wrap">
+                    <span class="layer-pill">Admin Control Panel</span>
+                    <span class="layer-pill">Owner device app</span>
+                    <span class="layer-pill">iOS notifications</span>
+                  </div>
+                </div>
+
+                <div class="layer-stack-row">
+                  <div class="layer-tag">
+                    <span class="layer-tag-badge">L3</span>
+                    <span class="layer-tag-title">SOC Core</span>
+                  </div>
+                  <div class="layer-pills-wrap">
+                    <span class="layer-pill">Detection engine</span>
+                    <span class="layer-pill">Notification hub</span>
+                    <span class="layer-pill">Firewall orchestrator</span>
+                    <span class="layer-pill">Forensic tracer</span>
+                  </div>
+                </div>
+
+                <div class="layer-stack-row">
+                  <div class="layer-tag">
+                    <span class="layer-tag-badge">L2</span>
+                    <span class="layer-tag-title">Shield Agent</span>
+                  </div>
+                  <div class="layer-pills-wrap">
+                    <span class="layer-pill">Process watch</span>
+                    <span class="layer-pill">Network flow tap</span>
+                    <span class="layer-pill">Payload quarantine</span>
+                  </div>
+                </div>
+
+                <div class="layer-stack-row">
+                  <div class="layer-tag">
+                    <span class="layer-tag-badge">L1</span>
+                    <span class="layer-tag-title">Protected Devices</span>
+                  </div>
+                  <div class="layer-pills-wrap">
+                    <span class="layer-pill">iPhone / iOS</span>
+                    <span class="layer-pill">Android</span>
+                    <span class="layer-pill">Windows & macOS</span>
+                    <span class="layer-pill">Linux servers</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Who Can Do What Table -->
+              <div style="text-align: left; margin-bottom: 12px;">
+                <h3 style="font-size: 20px; font-weight: 800; color: #fff;">Who can do what</h3>
+              </div>
+              <div class="rbac-table-container">
+                <table class="rbac-compare-table">
+                  <thead>
+                    <tr>
+                      <th>Capability</th>
+                      <th style="color: #fbbf24;">Super Admin</th>
+                      <th style="color: var(--accent-cyan);">Admin</th>
+                      <th style="color: #c084fc;">SOC Operator</th>
+                      <th style="color: var(--accent-emerald);">Device Owner</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Enrol device & verify OTP</td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                    </tr>
+                    <tr>
+                      <td>View device health</td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Own device</span></td>
+                    </tr>
+                    <tr>
+                      <td>Run breach test cases</td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Read only</span></td>
+                      <td><span class="rbac-cross">✗ Access Restricted</span></td>
+                    </tr>
+                    <tr>
+                      <td>Create / remove firewall rules</td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-cross">✗ Escalation Required</span></td>
+                      <td><span class="rbac-cross">✗ Access Restricted</span></td>
+                    </tr>
+                    <tr>
+                      <td>Manage administrators</td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Operators</span></td>
+                      <td><span class="rbac-cross">✗ Read Only</span></td>
+                      <td><span class="rbac-cross">✗ Access Restricted</span></td>
+                    </tr>
+                    <tr>
+                      <td>Receive breach notifications</td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Full</span></td>
+                      <td><span class="rbac-check">✓ Own device</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Footer Guide -->
+              <footer style="margin-top: 30px; font-size: 12px; color: var(--text-dim); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span>🛡️</span> On iPhone: tap Share → Add to Home Screen to install Cyber Shield as an app.
+              </footer>
+            </section>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 2: SECURITY OVERVIEW DASHBOARD
+        ===================================================== -->
+        <div id="tab-overview" class="tab-pane">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div class="verification-status-pill" style="border-radius: 8px;">
+              <span>●</span>
+              <strong>VERIFIED HYBRID TELEMETRY:</strong> Real-time socket measurements & supervised ML classifier telemetry enriched with Threat Intelligence IOCs.
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-action blue" onclick="window.switchTab('tab-simulator')">⚡ Launch Cyber Range Test</button>
+              <button class="btn-action green" onclick="window.openCreateIncidentModal()">➕ Open Incident</button>
+            </div>
+          </div>
+
+          <!-- Overview Top Row -->
+          <div class="grid-2-1" style="margin-bottom: 20px;">
+            <div class="cyber-card">
+              <div class="card-header">
+                <span class="card-title">Overall Security Posture</span>
+                <span id="overviewPostureBadge" class="status-pill-badge CONTAINED">EXCELLENT</span>
+              </div>
+              <div class="card-body">
+                <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;">
+                  <span id="overviewPostureScore" style="font-size: 46px; font-weight: 800; color: var(--accent-emerald); font-family: var(--font-mono);">91</span>
+                  <span style="font-size: 16px; color: var(--text-dim); font-family: var(--font-mono);">/ 100</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+                  Weighted multi-domain evaluation based on active alerts, identity anomalies, endpoint health, and virtual patch deployment.
+                </div>
+                <div id="overviewDomainList" style="display: flex; flex-direction: column; gap: 8px;">
+                </div>
+              </div>
+            </div>
+
+            <div class="cyber-card">
+              <div class="card-header">
+                <span class="card-title">⚡ SOC Response Performance</span>
+                <span class="code-font" style="color: var(--accent-cyan);">SLA TARGETS</span>
+              </div>
+              <div class="card-body">
+                <div class="grid-1-1" style="gap: 12px;">
+                  <div style="background: rgba(15, 23, 42, 0.7); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="font-size: 10px; color: var(--text-dim); font-weight: 700; text-transform: uppercase;">Mean Time to Detect (MTTD)</div>
+                    <div id="overviewMttd" style="font-size: 22px; font-weight: 800; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 4px;">1.2s</div>
+                    <div style="font-size: 10px; color: var(--accent-emerald); margin-top: 2px;">⚡ Under 2s SLA Target</div>
+                  </div>
+                  <div style="background: rgba(15, 23, 42, 0.7); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="font-size: 10px; color: var(--text-dim); font-weight: 700; text-transform: uppercase;">Mean Time to Respond (MTTR)</div>
+                    <div id="overviewMttr" style="font-size: 22px; font-weight: 800; color: var(--accent-emerald); font-family: var(--font-mono); margin-top: 4px;">4.8s</div>
+                    <div style="font-size: 10px; color: var(--accent-emerald); margin-top: 2px;">⚡ Automated Mitigation</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trend Chart Row -->
+          <div class="grid-2-1" style="margin-bottom: 20px;">
+            <div class="cyber-card">
+              <div class="card-header">
+                <span class="card-title">📈 24-Hour Incident & Threat Volume Trend</span>
+                <span class="code-font" style="color: var(--accent-cyan);">HOURLY AGGREGATION</span>
+              </div>
+              <div class="card-body" style="padding: 12px; height: 210px;">
+                <canvas id="overviewTrendChartCanvas" style="width: 100%; height: 100%;"></canvas>
+              </div>
+            </div>
+
+            <div class="cyber-card">
+              <div class="card-header">
+                <span class="card-title">🎯 Severity Breakdown</span>
+                <span class="code-font" style="color: var(--text-dim);">ACTIVE QUEUE</span>
+              </div>
+              <div class="card-body">
+                <div id="overviewSeverityTrack" style="height: 12px; border-radius: 6px; overflow: hidden; display: flex; margin-bottom: 16px;"></div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center;">
+                  <div style="background: rgba(255,255,255,0.02); padding: 8px 4px; border-radius: 4px;">
+                    <div id="sevCountCritical" style="font-size: 16px; font-weight: 800; color: var(--accent-crimson); font-family: var(--font-mono);">4</div>
+                    <div style="font-size: 9px; text-transform: uppercase; color: var(--text-dim);">Critical</div>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.02); padding: 8px 4px; border-radius: 4px;">
+                    <div id="sevCountHigh" style="font-size: 16px; font-weight: 800; color: #f97316; font-family: var(--font-mono);">7</div>
+                    <div style="font-size: 9px; text-transform: uppercase; color: var(--text-dim);">High</div>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.02); padding: 8px 4px; border-radius: 4px;">
+                    <div id="sevCountMedium" style="font-size: 16px; font-weight: 800; color: var(--accent-amber); font-family: var(--font-mono);">2</div>
+                    <div style="font-size: 9px; text-transform: uppercase; color: var(--text-dim);">Medium</div>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.02); padding: 8px 4px; border-radius: 4px;">
+                    <div id="sevCountLow" style="font-size: 16px; font-weight: 800; color: var(--accent-blue); font-family: var(--font-mono);">2</div>
+                    <div style="font-size: 9px; text-transform: uppercase; color: var(--text-dim);">Low</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 3: INCIDENTS MANAGEMENT
+        ===================================================== -->
+        <div id="tab-incidents" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">🚨 Enterprise Incident Management & Case Tracking</span>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <input id="incidentSearchInput" class="form-input" style="width: 220px; padding: 6px 12px; font-size: 12px;" placeholder="🔍 Search incidents..." oninput="window.renderIncidentsTable()">
+                <select id="incidentSeverityFilter" class="form-input" style="width: 130px; padding: 6px 10px; font-size: 12px;" onchange="window.renderIncidentsTable()">
+                  <option value="ALL">All Severities</option>
+                  <option value="CRITICAL">Critical</option>
+                  <option value="HIGH">High</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="LOW">Low</option>
+                </select>
+                <button class="btn-action green" onclick="window.openCreateIncidentModal()">➕ Create Incident</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;" id="incidentStatusChips">
+                <button class="filter-chip active" data-status="ALL">All Cases (<span id="countIncAll">4</span>)</button>
+                <button class="filter-chip" data-status="NEW">New (<span id="countIncNew">1</span>)</button>
+                <button class="filter-chip" data-status="TRIAGED">Triaged (<span id="countIncTriaged">0</span>)</button>
+                <button class="filter-chip" data-status="INVESTIGATING">Investigating (<span id="countIncInvestigating">1</span>)</button>
+                <button class="filter-chip" data-status="CONTAINED">Contained (<span id="countIncContained">1</span>)</button>
+                <button class="filter-chip" data-status="MITIGATED">Mitigated (<span id="countIncMitigated">1</span>)</button>
+                <button class="filter-chip" data-status="CLOSED">Closed (<span id="countIncClosed">0</span>)</button>
+              </div>
+
+              <div class="table-wrapper">
+                <table class="cyber-table">
+                  <thead>
+                    <tr>
+                      <th>Case ID</th>
+                      <th>Severity</th>
+                      <th>Incident Title</th>
+                      <th>Status</th>
+                      <th>Assigned Analyst</th>
+                      <th>Affected Asset</th>
+                      <th>Source IP</th>
+                      <th>Confidence</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="incidentsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 4: SECURITY ALERTS
+        ===================================================== -->
+        <div id="tab-alerts" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">⚡ Security Alerts & Real-Time Ingress Detections</span>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input id="alertSearchInput" class="form-input" style="width: 220px; padding: 6px 12px; font-size: 12px;" placeholder="🔍 Filter alerts..." oninput="window.filterAlertsTable()">
+                <select id="alertSeverityFilter" class="form-input" style="width: 140px; padding: 6px 10px; font-size: 12px;" onchange="window.filterAlertsTable()">
+                  <option value="ALL">All Severities</option>
+                  <option value="CRITICAL">Critical Only</option>
+                  <option value="HIGH">High Only</option>
+                  <option value="MEDIUM">Medium Only</option>
+                  <option value="LOW">Low Only</option>
+                </select>
+                <button class="btn-action blue" onclick="window.switchTab('tab-simulator')">Simulate Attack</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrapper">
+                <table class="cyber-table">
+                  <thead>
+                    <tr>
+                      <th>Alert ID</th>
+                      <th>Severity</th>
+                      <th>Threat Vector</th>
+                      <th>Attribution</th>
+                      <th>Source IP</th>
+                      <th>Target Asset</th>
+                      <th>Confidence</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="alertTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 5: LIVE THREAT MAP HUD
+        ===================================================== -->
+        <div id="tab-soc" class="tab-pane">
+          <div class="grid-2-1">
+            <div>
+              <div class="cyber-card">
+                <div class="card-header">
+                  <span class="card-title">🌐 Live Topological Threat & Network Visualizer</span>
+                  <span class="code-font" style="color: var(--accent-cyan);">PERIMETER & PHONE SHIELD HUD</span>
+                </div>
+                <div class="card-body" style="padding: 12px;">
+                  <div style="position: relative; width: 100%; height: 320px; background: radial-gradient(circle, #0e172a 0%, #060911 100%); border-radius: var(--radius-sm); overflow: hidden;">
+                    <canvas id="networkVisualizerCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cyber-card">
+                <div class="card-header">
+                  <span class="card-title">📈 Real-Time Flow Throughput vs Anomaly Deviation</span>
+                  <span class="code-font" style="color: var(--text-dim);">SAMPLING: 50ms</span>
+                </div>
+                <div class="card-body" style="padding: 12px; height: 190px;">
+                  <canvas id="telemetryChartCanvas" style="width: 100%; height: 100%;"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="cyber-card" style="height: calc(100% - 20px);">
+                <div class="card-header">
+                  <span class="card-title">🚨 Real-Time Security Stream</span>
+                  <span class="code-font" style="color: var(--accent-crimson);">LIVE FEED</span>
+                </div>
+                <div class="card-body">
+                  <div class="alert-feed" id="alertFeed" style="display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 6: THREAT INTELLIGENCE (IOCS)
+        ===================================================== -->
+        <div id="tab-threat-intel" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">🎯 Threat Intelligence & IOC Management</span>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <input id="iocSearchInput" class="form-input" style="width: 200px; padding: 6px 12px; font-size: 12px;" placeholder="🔍 Search IOC, actor..." oninput="window.renderThreatIntelTable()">
+                <button class="btn-action green" onclick="window.openAddIocModal()">➕ Add IOC</button>
+                <button class="btn-action blue" onclick="window.openImportStixModal()">📥 Import STIX</button>
+                <button class="btn-action gray" onclick="window.exportStixBundle()">📤 Export STIX</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrapper">
+                <table class="cyber-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Indicator Value (IOC)</th>
+                      <th>Threat Score</th>
+                      <th>Severity</th>
+                      <th>Threat Actor</th>
+                      <th>Confidence</th>
+                      <th>Status</th>
+                      <th>Last Seen</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="threatIntelTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 7: CYBER ATTACK RANGE (11 VECTORS)
+        ===================================================== -->
+        <div id="tab-simulator" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">⚡ Interactive Cyber Attack Simulation Range</span>
+              <span class="code-font" style="color: var(--accent-amber);">11 COMPREHENSIVE VECTORS</span>
+            </div>
+            <div class="card-body">
+              <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Trigger realistic cyber attack scenarios on-demand to observe real-time Machine Learning classification,
+                source file pinpointing, unsupervised anomaly scoring, instant phone shielding, and autonomous quarantine.
+              </p>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                <div class="cyber-card" style="margin-bottom: 0; padding: 18px;">
+                  <div style="font-size: 24px; margin-bottom: 8px;">🌊</div>
+                  <h4 style="color: #fff; font-size: 15px;">SYN Flood DDoS Attack</h4>
+                  <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">MITRE ATT&CK: T1498.001</div>
+                  <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">High-volume packet flood targeting server socket queue in <code>server.js:Line 42</code>.</p>
+                  <button class="btn-action red" style="width: 100%; justify-content: center;" onclick="window.launchSimulation('ddos')">⚡ Simulate SYN Flood</button>
+                </div>
+
+                <div class="cyber-card" style="margin-bottom: 0; padding: 18px;">
+                  <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
+                  <h4 style="color: #fff; font-size: 15px;">Mobile Trojan / Pegasus C2</h4>
+                  <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">MITRE ATT&CK: T1437</div>
+                  <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Trojan C2 heartbeat on port 9001 attempting to exfiltrate phone SMS/OTP and contacts.</p>
+                  <button class="btn-action blue" style="width: 100%; justify-content: center;" onclick="window.launchSimulation('mobile_spyware')">📱 Simulate Mobile Spyware</button>
+                </div>
+
+                <div class="cyber-card" style="margin-bottom: 0; padding: 18px;">
+                  <div style="font-size: 24px; margin-bottom: 8px;">💉</div>
+                  <h4 style="color: #fff; font-size: 15px;">SQL Injection Breach</h4>
+                  <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">MITRE ATT&CK: T1190</div>
+                  <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">SQL tautology injection (<code>' OR '1'='1 --</code>) targeting database gateway.</p>
+                  <button class="btn-action yellow" style="width: 100%; justify-content: center;" onclick="window.launchSimulation('sql_injection')">💉 Simulate SQL Injection</button>
+                </div>
+
+                <div class="cyber-card" style="margin-bottom: 0; padding: 18px;">
+                  <div style="font-size: 24px; margin-bottom: 8px;">💳</div>
+                  <h4 style="color: #fff; font-size: 15px;">Sensitive Data Exfiltration (DLP)</h4>
+                  <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">MITRE ATT&CK: T1048.003</div>
+                  <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Egress transfer containing Credit Cards (Luhn verified) and SSNs.</p>
+                  <button class="btn-action red" style="width: 100%; justify-content: center;" onclick="window.launchSimulation('data_exfil')">⚡ Simulate Data Exfiltration</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 8: CODEBASE FORENSICS & VIRTUAL PATCHING
+        ===================================================== -->
+        <div id="tab-source" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">📍 Codebase Target File & Line Location Forensics</span>
+              <span class="code-font" style="color: var(--accent-cyan);">EXPLOIT REVERSE LOCATOR</span>
+            </div>
+            <div class="card-body">
+              <p style="color: var(--text-muted); margin-bottom: 20px;">
+                AegisAI automatically maps attack vectors directly to the exact source file, function, and line numbers in the application codebase.
+              </p>
+              <div style="background: rgba(11, 17, 30, 0.85); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 12px;">
+                  <div>
+                    <span style="color: var(--text-dim); font-size: 12px;">Target File:</span>
+                    <strong id="forensicSourceFile" style="color: #fff; margin-left: 6px;">server.js</strong>
+                    <span class="badge-mitre" id="forensicLineRange" style="margin-left: 6px;">Lines 42-65</span>
+                  </div>
+                  <button class="btn-action green" id="btnApplyVirtualPatch" onclick="window.applyCurrentPatch()">
+                    ⚡ Deploy Virtual Patch
+                  </button>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                  <b>Vulnerability:</b> <span id="forensicVulnDesc" style="color: #fff;">TCP socket queue allocation without dynamic ingress SYN-rate backpressure.</span>
+                </div>
+                <div class="grid-1-1">
+                  <div>
+                    <div style="font-size: 11px; font-weight: 700; color: #f87171; margin-bottom: 4px;">🔴 Targeted Code in Source File</div>
+                    <pre class="code-font" id="forensicVulnerableSnippet" style="background: #020609; padding: 12px; border-radius: 6px; color: #fca5a5; overflow-x: auto;">// Loading source location...</pre>
+                  </div>
+                  <div>
+                    <div style="font-size: 11px; font-weight: 700; color: var(--accent-emerald); margin-bottom: 4px;">🟢 Auto-Generated Virtual Patch (In-Memory)</div>
+                    <pre class="code-font" id="forensicVirtualPatch" style="background: #020609; padding: 12px; border-radius: 6px; color: #86efac; overflow-x: auto;">// Loading patch...</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 9: PHONE & MOBILE ENDPOINT SHIELD
+        ===================================================== -->
+        <div id="tab-mobile" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">📱 Phone & Mobile Endpoint Immediate Defense Shield</span>
+              <span class="code-font" style="color: var(--accent-emerald);">MOBILE FIREWALL GENERATOR</span>
+            </div>
+            <div class="card-body">
+              <p style="color: var(--text-muted); margin-bottom: 16px;">
+                Generates instant device-level firewall rules for Android (AFWall+ / iptables), Apple iOS MDM configuration profiles (.mobileconfig), and Hotspot isolation.
+              </p>
+              <div id="mobileDevicesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;"></div>
+              <div class="grid-1-1">
+                <div class="cyber-card" style="margin-bottom: 0;">
+                  <div class="card-header"><span class="card-title">🤖 Android Instant Firewall</span><button class="btn-inspect" onclick="window.downloadAndroidScript()">📥 Download .sh</button></div>
+                  <div class="card-body"><pre class="code-font" id="androidRulesPreview" style="background: #020609; padding: 12px; border-radius: 6px; color: var(--accent-cyan); overflow-x: auto;"># Android iptables</pre></div>
+                </div>
+                <div class="cyber-card" style="margin-bottom: 0;">
+                  <div class="card-header"><span class="card-title">🍎 Apple iOS MobileConfig</span><button class="btn-inspect" onclick="window.downloadIosProfile()">📥 Download .mobileconfig</button></div>
+                  <div class="card-body"><pre class="code-font" id="iosRulesPreview" style="background: #020609; padding: 12px; border-radius: 6px; color: var(--accent-cyan); overflow-x: auto;">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</pre></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 10: USER PORTAL & ENDPOINT ENROLMENT
+        ===================================================== -->
+        <div id="tab-user-portal" class="tab-pane">
+          <div class="grid-1-1">
+            <div class="cyber-card">
+              <div class="card-header">
+                <span class="card-title">📝 Register for CyberShield Endpoint Protection</span>
+                <span class="badge-mitre">FREE HACKATHON ENROLMENT</span>
+              </div>
+              <div class="card-body">
+                <p style="color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 14px;">
+                  Enrol your mobile device, laptop, or workstation into the autonomous AI defense perimeter.
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div><label class="form-label">Full Name</label><input id="regNameInput" class="form-input" placeholder="e.g. John Doe"></div>
+                  <div><label class="form-label">Phone Number</label><input id="regPhoneInput" class="form-input" placeholder="+1-555-0199"></div>
+                  <div><label class="form-label">Email Address</label><input id="regEmailInput" class="form-input" type="email" placeholder="john.doe@example.com"></div>
+                  <div class="grid-1-1" style="gap: 12px;">
+                    <div>
+                      <label class="form-label">Operating System</label>
+                      <select id="regOSSelect" class="form-input">
+                        <option value="Android">Android</option><option value="iOS">iOS (Apple)</option><option value="Windows">Windows</option><option value="macOS">macOS</option><option value="Linux">Linux</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="form-label">Device Type</label>
+                      <select id="regDeviceSelect" class="form-input">
+                        <option value="Mobile Phone">Mobile Phone</option><option value="Laptop">Laptop</option><option value="Desktop">Desktop</option><option value="Server">Server</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div><label class="form-label">Network Type</label><input id="regNetworkInput" class="form-input" placeholder="e.g. Wi-Fi / 5G / Fiber"></div>
+                  <button class="btn-action green" style="padding: 10px 20px; font-size: 13px; justify-content: center; margin-top: 6px;" onclick="window.submitUserRegistration()">✅ Complete Registration</button>
+                  <div id="userRegistrationResultBox" style="margin-top: 8px;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Self-Service Device Status -->
+            <div class="cyber-card">
+              <div class="card-header"><span class="card-title">🔍 Check Device Status & Safety Checklist</span></div>
+              <div class="card-body">
+                <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+                  <input id="userStatusLookupId" class="form-input" placeholder="Registration ID (e.g. CS50-DEV01)">
+                  <button class="btn-action blue" onclick="window.checkUserDeviceStatus()">Check Status</button>
+                </div>
+                <div id="userStatusResultArea" style="margin-bottom: 16px;"></div>
+                <ul style="color: var(--text-muted); font-size: 12px; line-height: 1.8; padding-left: 20px;">
+                  <li>Never share OTPs, two-factor codes, or passwords over the phone or SMS.</li>
+                  <li>Do not click unverified links in unexpected emails or WhatsApp messages.</li>
+                  <li>Isolate your phone or laptop immediately if anomalous popups appear.</li>
+                  <li>Verify Wi-Fi SSIDs before connecting to avoid Rogue Evil-Twin Hotspots.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 11: ADMIN CONTROL CENTER
+        ===================================================== -->
+        <div id="tab-admin-control" class="tab-pane">
+          <!-- Executive Stats -->
+          <div class="kpi-grid" style="padding: 0 0 16px 0;">
+            <div class="kpi-card"><div class="kpi-header"><span class="kpi-title">Total Registrations</span><span class="kpi-icon">👥</span></div><div id="adminTotalUsers" class="kpi-value">4</div></div>
+            <div class="kpi-card"><div class="kpi-header"><span class="kpi-title">Administrators</span><span class="kpi-icon">👑</span></div><div id="adminTotalAdmins" class="kpi-value">3</div></div>
+            <div class="kpi-card success"><div class="kpi-header"><span class="kpi-title">Security Checks</span><span class="kpi-icon">🛡️</span></div><div id="adminTotalChecks" class="kpi-value" style="color: var(--accent-emerald);">8</div></div>
+            <div class="kpi-card warning"><div class="kpi-header"><span class="kpi-title">System Status</span><span class="kpi-icon">⏱️</span></div><div id="adminSystemStatus" class="kpi-value" style="color: var(--accent-emerald);">SAFE</div></div>
+          </div>
+
+          <!-- Active Sessions Oversight -->
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">🔐 Active Authenticated Operator Sessions</span>
+              <button class="btn-action red" onclick="window.killAllOtherSessions()">⚡ Kill All Other Sessions</button>
+            </div>
+            <div class="card-body">
+              <div class="table-wrapper">
+                <table class="cyber-table">
+                  <thead><tr><th>Session Token</th><th>User</th><th>Role</th><th>IP</th><th>Client</th><th>Action</th></tr></thead>
+                  <tbody id="activeSessionsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- RBAC Matrix -->
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">🛡️ Role-Based Access Control (RBAC) Permissions Matrix</span>
+              <button class="btn-action blue" onclick="window.saveRbacMatrix()">💾 Save Permissions Matrix</button>
+            </div>
+            <div class="card-body">
+              <div class="table-wrapper">
+                <table class="cyber-table rbac-matrix-table">
+                  <thead>
+                    <tr>
+                      <th>Permission Capability</th>
+                      <th style="text-align: center;">SUPER_ADMIN</th>
+                      <th style="text-align: center;">ADMIN</th>
+                      <th style="text-align: center;">SOC_OPERATOR</th>
+                      <th style="text-align: center;">SECURITY_AUDITOR</th>
+                      <th style="text-align: center;">REGISTERED_USER</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rbacMatrixTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 12: HARDWARE & INGESTION CLUSTER
+        ===================================================== -->
+        <div id="tab-hardware-monitor" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header"><span class="card-title">🖥️ Monitored Endpoint Hardware Cluster</span><button class="btn-action blue" onclick="window.fetchHardwareCluster()">🔄 Refresh Cluster</button></div>
+            <div class="card-body">
+              <div class="hardware-nodes-grid" id="hardwareNodesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px;"></div>
+              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-weight: 700; color: #fff;">Selected Node Telemetry: <span id="selectedNodeTitle" style="color: var(--accent-cyan);">LOCAL-SOC-HOST</span></span>
+                  <span class="status-pill-badge CONTAINED">ONLINE</span>
+                </div>
+                <div style="height: 180px;"><canvas id="hardwareTelemetryCanvas" style="width: 100%; height: 100%;"></canvas></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 13: VERIFICATION PANEL (2FA & ATTESTATION)
+        ===================================================== -->
+        <div id="tab-verification-panel" class="tab-pane">
+          <div class="grid-1-1">
+            <div class="cyber-card" style="text-align: center;">
+              <div class="card-header"><span class="card-title">🛡️ RFC 6238 TOTP Authenticator</span></div>
+              <div class="card-body" style="display: flex; flex-direction: column; align-items: center;">
+                <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Rolling 6-Digit Code</div>
+                <div id="totpLiveRollingCode" style="font-family: var(--font-mono); font-size: 40px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 6px; margin: 10px 0;">777888</div>
+                <div id="totpSecondsLeftDisplay" style="font-size: 11px; color: var(--text-dim); margin-bottom: 14px;">30s remaining in current time window</div>
+                <div style="display: flex; gap: 8px; width: 100%; max-width: 320px;">
+                  <input type="text" id="totpVerifyInput" class="form-input" style="text-align: center; letter-spacing: 2px;" placeholder="Enter 6-digit code">
+                  <button class="btn-action blue" onclick="window.verifyTotpCode()">Verify</button>
+                </div>
+                <div id="totpVerifyFeedback" style="font-size: 12px; margin-top: 10px;"></div>
+              </div>
+            </div>
+
+            <div class="cyber-card">
+              <div class="card-header"><span class="card-title">🎟️ Emergency One-Time Scratch Codes</span><button class="btn-action blue" onclick="window.rotateScratchCodes()">🔄 Generate New</button></div>
+              <div class="card-body">
+                <div id="scratchCodesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 14: AUDIT TRAILS (TAMPER-EVIDENT SHA-256)
+        ===================================================== -->
+        <div id="tab-audit-trail" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">📜 Tamper-Evident Security Audit Ledger (SHA-256 Chained)</span>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-action green" onclick="window.verifyAuditChain()">🔍 Verify Hash Integrity</button>
+                <button class="btn-action blue" onclick="window.exportAuditCsv()">📥 Export CSV</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrapper">
+                <table class="cyber-table">
+                  <thead>
+                    <tr><th>Block ID</th><th>Timestamp</th><th>Actor</th><th>Role</th><th>Action</th><th>Target</th><th>SHA-256 Record Hash</th></tr>
+                  </thead>
+                  <tbody id="auditTrailsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================
+             TAB 15: DATABASE SCHEMA & SQL CONSOLE
+        ===================================================== -->
+        <div id="tab-database-schema" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header">
+              <span class="card-title">💻 Safe Read-Only SQL Diagnostic Console</span>
+              <button class="btn-action blue" onclick="window.executeSqlConsoleQuery()">▶ Execute Query</button>
+            </div>
+            <div class="card-body">
+              <textarea id="sqlConsoleInput" class="form-input code-font" style="width: 100%; height: 90px; color: var(--accent-cyan);" spellcheck="false">SELECT id, title, severity, status FROM incidents LIMIT 10;</textarea>
+              <div id="sqlQueryOutputWrapper" style="margin-top: 14px; display: none;">
+                <table class="cyber-table" id="sqlQueryResultTable"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Operational Tabs (Perimeter, Stealth, Settings, Reports, etc.) -->
+        <div id="tab-security-panel" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header"><span class="card-title">🛡️ Quarantined Offender Blacklist</span></div>
+            <div class="card-body">
+              <div class="table-wrapper">
+                <table class="cyber-table">
+                  <thead><tr><th>Offending IP Address</th><th>Quarantine Reason</th><th>Blocked At</th><th>Firewall Status</th><th>Action</th></tr></thead>
+                  <tbody id="firewallTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-stealth" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header"><span class="card-title">🕵️ Stealth Cloak & Deception Honeypots</span><span class="status-pill-badge CONTAINED">ACTIVE</span></div>
+            <div class="card-body">
+              <p style="color: var(--text-muted); margin-bottom: 14px;">Strips server headers, redirects bots to 4.5s honeypot tarpit, and monitors probe hits.</p>
+              <div id="honeypotFeed" class="alert-feed"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-ueba" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header"><span class="card-title">👤 Identity & UEBA Authentication Stream</span></div>
+            <div class="card-body"><div class="table-wrapper"><table class="cyber-table"><thead><tr><th>Time</th><th>User</th><th>IP</th><th>Location</th><th>Status</th><th>Risk Score</th></tr></thead><tbody id="uebaTableBody"></tbody></table></div></div>
+          </div>
+        </div>
+
+        <div id="tab-dlp" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header"><span class="card-title">🔒 Data Loss Prevention (DLP) Egress</span></div>
+            <div class="card-body"><div class="table-wrapper"><table class="cyber-table"><thead><tr><th>Time</th><th>Source</th><th>Destination</th><th>Compliance</th><th>Findings</th><th>Masked Snippet</th></tr></thead><tbody id="dlpTableBody"></tbody></table></div></div>
+          </div>
+        </div>
+
+        <div id="tab-settings" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header"><span class="card-title">⚙️ Security Settings</span><button class="btn-action green" onclick="window.saveSettings()">💾 Save Settings</button></div>
+            <div class="card-body"><p style="color: var(--text-muted);">Configure autonomous auto-block thresholds, mobile firewall propagation, and deception stall delays.</p></div>
+          </div>
+        </div>
+
+        <div id="tab-reports" class="tab-pane">
+          <div class="cyber-card">
+            <div class="card-header"><span class="card-title">📄 Security Audit Reports</span><button id="btnExportReport" class="btn-action blue">📥 Export JSON Report</button></div>
+            <div class="card-body"><p style="color: var(--text-muted);">NIST SP 800-61 Rev. 2 and ISO/IEC 27001 compliant security telemetry report.</p></div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Modals & Overlays -->
+  <!-- Incident Investigation Drawer -->
+  <div id="incidentDetailsDrawer" class="incident-drawer-backdrop" onclick="window.closeIncidentDrawer(event)">
+    <div class="incident-drawer-panel" onclick="event.stopPropagation()">
+      <div class="drawer-header">
+        <div>
+          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px;">
+            <span id="drawerSeverityBadge" class="badge-severity CRITICAL">CRITICAL</span>
+            <span id="drawerStatusBadge" class="status-pill-badge INVESTIGATING">INVESTIGATING</span>
+            <span id="drawerIncidentId" class="code-font" style="color: var(--accent-cyan); font-weight: 700;">INC-2026-0814</span>
+          </div>
+          <h2 id="drawerIncidentTitle" style="font-size: 18px; color: #fff; margin: 0;">Incident Title</h2>
+        </div>
+        <button class="modal-close" onclick="window.closeIncidentDrawer()">✕</button>
+      </div>
+      <div class="drawer-body">
+        <p id="drawerSummary" style="color: var(--text-main); font-size: 13px; line-height: 1.5;"></p>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 10px 14px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--accent-emerald); text-transform: uppercase;">Containment Status:</span>
+          <div id="drawerContainment" style="color: #fff; font-size: 12px; margin-top: 2px;"></div>
+        </div>
+        <div id="drawerCommentsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        <div style="display: flex; gap: 8px;">
+          <input id="drawerNewCommentInput" class="form-input" placeholder="Add forensic observation or action note..." onkeydown="if(event.key==='Enter') window.addDrawerComment()">
+          <button class="btn-action blue" onclick="window.addDrawerComment()">Post Note</button>
+        </div>
+      </div>
+      <div class="drawer-footer">
+        <select id="drawerStatusSelect" class="form-select" onchange="window.updateDrawerStatus()">
+          <option value="NEW">Status: NEW</option><option value="TRIAGED">Status: TRIAGED</option><option value="INVESTIGATING">Status: INVESTIGATING</option><option value="CONTAINED">Status: CONTAINED</option><option value="MITIGATED">Status: MITIGATED</option><option value="CLOSED">Status: CLOSED</option>
+        </select>
+        <button class="btn-action gray" onclick="window.closeIncidentDrawer()">Close Drawer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Incident Modal -->
+  <div id="createIncidentModal" class="full-overlay-modal">
+    <div class="cyber-modal" style="max-width: 540px; padding: 24px;">
+      <h3 style="color: var(--accent-cyan); margin-bottom: 14px;">➕ Formalize New Incident Case</h3>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <input id="newIncTitle" class="form-input" placeholder="Incident Title">
+        <div class="grid-1-1" style="gap: 12px;">
+          <select id="newIncSeverity" class="form-input"><option value="CRITICAL">CRITICAL</option><option value="HIGH" selected>HIGH</option><option value="MEDIUM">MEDIUM</option></select>
+          <select id="newIncStatus" class="form-input"><option value="NEW">NEW</option><option value="TRIAGED" selected>TRIAGED</option></select>
+        </div>
+        <input id="newIncCategory" class="form-input" placeholder="Threat Category">
+        <input id="newIncAsset" class="form-input" placeholder="Affected Asset">
+        <textarea id="newIncSummary" class="form-input" rows="3" placeholder="Case Summary"></textarea>
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <button class="btn-action green" style="flex: 1; justify-content: center;" onclick="window.submitCreateIncident()">Save Incident</button>
+          <button class="btn-action gray" onclick="window.closeCreateIncidentModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Threat Intel Modal -->
+  <div id="threatIntelModal" class="full-overlay-modal">
+    <div class="cyber-modal" style="max-width: 520px; padding: 24px;">
+      <h3 id="threatIntelModalTitle" style="color: var(--accent-cyan); margin-bottom: 14px;">🎯 Register Threat Indicator (IOC)</h3>
+      <input type="hidden" id="iocEditId">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="grid-1-1" style="gap: 12px;">
+          <select id="iocTypeSelect" class="form-input"><option value="IPV4">IPv4 Address</option><option value="DOMAIN">Domain Name</option><option value="HASH_SHA256">SHA-256 Hash</option></select>
+          <select id="iocSeveritySelect" class="form-input"><option value="CRITICAL">CRITICAL</option><option value="HIGH">HIGH</option><option value="MEDIUM">MEDIUM</option></select>
+        </div>
+        <input id="iocValueInput" class="form-input" placeholder="Indicator Value (e.g. 198.51.100.42)">
+        <input id="iocActorInput" class="form-input" placeholder="Threat Actor Attribution">
+        <button class="btn-action green" style="justify-content: center; margin-top: 6px;" onclick="window.submitIocForm()">Save Indicator</button>
+        <button class="btn-action gray" style="justify-content: center;" onclick="window.closeThreatIntelModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2FA Modal -->
+  <div id="totp2faModal" class="full-overlay-modal">
+    <div class="cyber-modal" style="max-width: 440px; text-align: center; padding: 24px;">
+      <div style="font-size: 38px; margin-bottom: 6px;">🛡️</div>
+      <h3 style="color: var(--accent-cyan); margin-bottom: 6px;">Security 2FA Verification</h3>
+      <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 14px;">Enter verification code (Demo code: <b>777888</b>)</p>
+      <input id="totpCodeInput" class="form-input code-font" style="font-size: 24px; text-align: center; letter-spacing: 6px; width: 200px; margin: 0 auto 14px auto;" maxlength="6" placeholder="777888">
+      <div style="display: flex; gap: 8px; justify-content: center;">
+        <button class="btn-action green" onclick="window.verify2faCode()">Verify Code</button>
+        <button class="btn-action gray" onclick="window.close2faModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Palette Modal -->
+  <div id="commandPaletteModal" class="command-palette-backdrop" onclick="window.closeCommandPalette(event)">
+    <div class="command-palette-box" onclick="event.stopPropagation()">
+      <div class="palette-input-wrap">
+        <span>🔍</span>
+        <input id="paletteInput" class="palette-input" placeholder="Type to search or jump to any module..." autocomplete="off">
+        <span class="search-kbd-hint">ESC</span>
+      </div>
+      <div class="palette-results-list" id="paletteResultsList"></div>
+    </div>
+  </div>
+
+  <!-- RBAC Switcher Modal -->
+  <div id="rbacModal" class="full-overlay-modal">
+    <div class="cyber-modal" style="max-width: 520px; padding: 24px;">
+      <h3 style="color: var(--accent-cyan); text-align: center; margin-bottom: 12px;">Role-Based Access Control (RBAC)</h3>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="btn-action yellow" style="justify-content: space-between; padding: 10px;" onclick="window.switchRbacRole('SUPER_ADMIN')">
+          <span>👑 <b>Sunny</b> • Super Admin</span><span class="role-badge SUPER_ADMIN">SUPER_ADMIN</span>
+        </button>
+        <button class="btn-action blue" style="justify-content: space-between; padding: 10px;" onclick="window.switchRbacRole('ADMIN')">
+          <span>🛡️ <b>Alex Rivera</b> • Security Admin</span><span class="role-badge ADMIN">ADMIN</span>
+        </button>
+        <button class="btn-action gray" style="justify-content: space-between; padding: 10px;" onclick="window.switchRbacRole('SOC_OPERATOR')">
+          <span>🛰️ <b>Sarah Chen</b> • SOC Operator</span><span class="role-badge SOC_OPERATOR">SOC_OPERATOR</span>
+        </button>
+        <button class="btn-action green" style="justify-content: space-between; padding: 10px;" onclick="window.switchRbacRole('REGISTERED_USER')">
+          <span>👤 <b>Michael Scott</b> • Protected User</span><span class="role-badge REGISTERED_USER">USER</span>
+        </button>
+        <button class="btn-action gray" style="justify-content: center; margin-top: 8px;" onclick="window.closeRbacModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forensic Inspection Modal -->
+  <div id="inspectModal" class="modal-backdrop">
+    <div class="cyber-modal">
+      <div class="modal-header">
+        <span class="modal-title">🔍 Incident Forensics, Source Code & Phone Shield</span>
+        <button class="modal-close" onclick="document.getElementById('inspectModal').classList.remove('show')">✕</button>
+      </div>
+      <div class="modal-body" id="inspectModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="visualizer.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
